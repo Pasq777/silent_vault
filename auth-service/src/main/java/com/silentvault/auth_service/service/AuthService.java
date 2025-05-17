@@ -2,6 +2,7 @@ package com.silentvault.auth_service.service;
 
 import com.silentvault.auth_service.dao.model.User;
 import com.silentvault.auth_service.dao.repository.UserRepository;
+import com.silentvault.auth_service.exception.BusinessException;
 import com.silentvault.auth_service.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,11 +19,11 @@ public class AuthService {
 
     public void register(String username, String email, String rawPassword) {
         if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("Username già esistente");
+            throw new BusinessException("Lo username '" + username + "' è già registrato");
         }
 
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email già in uso");
+            throw new BusinessException("L'email '" + email + "' è già in uso");
         }
 
         User user = new User();
