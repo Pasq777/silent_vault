@@ -14,3 +14,7 @@ spring:
       path: /h2-console
 server:
   port: 8080
+
+jwt:
+  secret: silentvault-super-top-secret-key-123456789!
+  expirationMs: 86400000 # 24 ore

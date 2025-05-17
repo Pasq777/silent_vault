@@ -1,5 +1,7 @@
 package com.silentvault.auth_service.config;
 
+import com.silentvault.auth_service.security.JwtAuthFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,9 +11,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
+
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,7 +44,8 @@ public class SecurityConfig {
                         .authenticated() //tolgo autenticazione da login, registrazione e console h2
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) //per evitare l'errore "Refused to display in a frame" quando apro http://localhost:8080/h2-console, disattivo l'header così:
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); //aggiungo filtro custom jwt
 
         return http.build();
     }

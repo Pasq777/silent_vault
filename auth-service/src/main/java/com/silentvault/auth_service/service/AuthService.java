@@ -2,6 +2,7 @@ package com.silentvault.auth_service.service;
 
 import com.silentvault.auth_service.dao.model.User;
 import com.silentvault.auth_service.dao.repository.UserRepository;
+import com.silentvault.auth_service.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
 
     public void register(String username, String email, String rawPassword) {
@@ -30,5 +32,17 @@ public class AuthService {
         user.setEnabled(true);
 
         userRepository.save(user);
+    }
+
+
+    public String login(String username, String rawPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new RuntimeException("Password errata");
+        }
+
+        return jwtUtils.generateToken(username);
     }
 }
